@@ -245,66 +245,107 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 bg-white">
+
+
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className=" font-bold mb-6 text-brand-red">PrimeFace Models & Talent Agency of Houston and The Woodlands, Texas</h2>
+          <p className="text-base text-gray-600 mb-4">
+            First Models and Talent Agency, Inc. is Houston's top modeling agency, placing models in lifestyle print, commercial print, fashion print, social media, commercials, runway, and special events. With over 36 years of industry experience, First Models has an impeccable track record for successful and profitable events.
+          </p>
+          <p className="text-base text-gray-600 mb-4">
+            We are a full-service modeling agency that will go the extra mile to make sure your event, photo shoot, casting, or commercial runs smoothly and effortlessly with our wonderful talent and crew! Our hands-on approach sets us apart and you will also have 24/7 access to the Agency Director, Colette Cole for specialized support.
+          </p>
+          <p className="text-base text-gray-600 mb-8">
+            As a specialized boutique agency staffed with industry experts, we work closely with both clients and talent to provide a highly personalized experience.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-block px-8 py-3 bg-white text-brand-red border-2 border-brand-red font-medium hover:bg-brand-red hover:text-white transition"
+          >
+            GET IN TOUCH
+          </Link>
+        </div>
+      </section>
+
+      {/* Instagram Feed Section */}
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-brand-red">Our Talent</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Discover our diverse roster of professional models for your next project
-            </p>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-2 text-gray-900">@FIRSTMODELSANDTALENT</h2>
+            <p className="text-gray-600">2.8K FOLLOWERS</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {categories.map((cat) => (
-              <div key={cat.title} className="group cursor-pointer">
-                <Link href={cat.links[0].href}>
-                  <div className="relative aspect-[3/4] overflow-hidden mb-6">
-                    <Image
-                      src={cat.image}
-                      alt={cat.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all duration-300" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <h3 className="text-white text-2xl font-bold tracking-wide">{cat.title}</h3>
-                    </div>
-                  </div>
-                </Link>
-                <div className="flex justify-center gap-6">
-                  {cat.links.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="text-sm text-gray-500 hover:text-black transition uppercase tracking-wide"
-                    >
-                      {link.name}
-                    </Link>
-                  ))}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {[
+              {
+                image: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=400&q=80",
+                caption: "Merry Christmas and Happy Holidays from all of us at First Models to you and your family. 🎄🎅❤️"
+              },
+              {
+                image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
+                caption: "This little man found his Columbia visual in Academy Sports + Outdoors, that's a win..."
+              },
+              {
+                image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80",
+                caption: "That's a huge win, seeing Ronnie, Matthew, and Marissa pop up in a Fred Haas commercial..."
+              },
+              {
+                image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&q=80",
+                caption: "Grace booked the big one in Houston and drove off 🚗 @graceperrizo @firstmodelsandtalent..."
+              },
+              {
+                image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&q=80",
+                caption: "Our talent is having an amazing time modeling for the San Luis Resort in Galveston! It's a perfect..."
+              },
+              {
+                image: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400&q=80",
+                caption: "Behind the scenes at our latest photo shoot with amazing talent!"
+              },
+              {
+                image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&q=80",
+                caption: "Another successful commercial shoot wrapped up today!"
+              },
+              {
+                image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
+                caption: "Our models bringing their A-game to every project!"
+              },
+              {
+                image: "https://images.unsplash.com/photo-1562572159-4efc207f5aff?w=400&q=80",
+                caption: "Fashion shoot highlights from this week's session!"
+              },
+              {
+                image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80",
+                caption: "Working with incredible brands and amazing talent!"
+              }
+            ].map((post, index) => (
+              <div key={index} className="group relative aspect-square overflow-hidden cursor-pointer">
+                <Image
+                  src={post.image}
+                  alt={`Instagram post ${index + 1}`}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-all duration-300 flex items-center justify-center p-4">
+                  <p className="text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center">
+                    {post.caption}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 text-brand-red">About PrimeFace Models</h2>
-          <p className="text-lg text-gray-600 mb-6">
-            PrimeFace Models and Talent Agency, Inc. is Houston's top modeling agency, placing models in
-            lifestyle print, commercial print, fashion print, social media, commercials, runway, and special events.
-          </p>
-          <p className="text-lg text-gray-600 mb-8">
-            We are a full-service modeling agency that goes the extra mile. Our hands-on approach sets us apart
-            with 24/7 access to the Agency Director for specialized support.
-          </p>
-          <Link
-            href="/contact"
-            className="inline-block px-8 py-3 bg-black text-white font-medium hover:bg-gray-800 transition"
-          >
-            GET IN TOUCH
-          </Link>
+          <div className="text-center mt-8">
+            <a
+              href="https://instagram.com/firstmodelsandtalent"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-brand-red hover:text-gray-900 transition font-medium"
+            >
+              <Instagram size={20} />
+              Follow us on Instagram
+            </a>
+          </div>
         </div>
       </section>
     </main>

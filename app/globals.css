@@ -1,7 +1,21 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
+:root {
   --color-brand-red: #8B0000;
+}
+
+.text-brand-red {
+  color: var(--color-brand-red);
+}
+
+.bg-brand-red {
+  background-color: var(--color-brand-red);
+}
+
+.hover\:text-brand-red:hover {
+  color: var(--color-brand-red);
 }
 
 body {
