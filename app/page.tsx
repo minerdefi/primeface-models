@@ -251,7 +251,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className=" font-bold mb-6 text-brand-red">PrimeFace Models & Talent Agency of Houston and The Woodlands, Texas</h2>
           <p className="text-base text-gray-600 mb-4">
-            First Models and Talent Agency, Inc. is Houston's top modeling agency, placing models in lifestyle print, commercial print, fashion print, social media, commercials, runway, and special events. With over 36 years of industry experience, First Models has an impeccable track record for successful and profitable events.
+            PrimeFace Models and Talent Agency, Inc. is Houston's top modeling agency, placing models in lifestyle print, commercial print, fashion print, social media, commercials, runway, and special events. With over 36 years of industry experience, PrimeFace Models has an impeccable track record for successful and profitable events.
           </p>
           <p className="text-base text-gray-600 mb-4">
             We are a full-service modeling agency that will go the extra mile to make sure your event, photo shoot, casting, or commercial runs smoothly and effortlessly with our wonderful talent and crew! Our hands-on approach sets us apart and you will also have 24/7 access to the Agency Director, Colette Cole for specialized support.
@@ -280,7 +280,7 @@ export default function Home() {
             {[
               {
                 image: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=400&q=80",
-                caption: "Merry Christmas and Happy Holidays from all of us at First Models to you and your family. 🎄🎅❤️"
+                caption: "Merry Christmas and Happy Holidays from all of us at PrimeFace Models to you and your family. 🎄🎅❤️"
               },
               {
                 image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",

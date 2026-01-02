@@ -85,7 +85,7 @@ export default function ContactForm() {
 
             <button
                 type="submit"
-                className="w-full bg-black text-white py-3 px-6 rounded-md font-semibold hover:bg-gray-800 transition"
+                className="w-full bg-white text-brand-red border-2 border-brand-red py-3 px-6 rounded-md font-semibold hover:bg-brand-red hover:text-white transition"
             >
                 Send Message
             </button>

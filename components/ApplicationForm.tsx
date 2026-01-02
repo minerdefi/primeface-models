@@ -220,7 +220,7 @@ export default function ApplicationForm() {
                 </p>
                 <button
                     type="submit"
-                    className="w-full bg-black text-white py-4 px-6 rounded-md font-semibold text-lg hover:bg-gray-800 transition"
+                    className="w-full bg-white text-brand-red border-2 border-brand-red py-4 px-6 rounded-md font-semibold text-lg hover:bg-brand-red hover:text-white transition"
                 >
                     Submit Application
                 </button>

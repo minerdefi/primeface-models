@@ -4,7 +4,17 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Facebook, Instagram } from 'lucide-react'
+import { Facebook, Instagram } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const navLinks = [
+    { name: "FEMALE MODELS", href: "/female-fashion" },
+    { name: "MALE MODELS", href: "/male-fashion" },
+    { name: "CHILDREN", href: "/children-male" },
+    { name: "OUR WORK", href: "/our-work" },
+    { name: "BECOME A MODEL", href: "/become-a-model" },
+    { name: "CONTACT", href: "/contact" },
+]
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -14,68 +24,85 @@ export default function Header() {
     return (
         <header className={isHomePage ? "absolute top-0 left-0 right-0 z-50" : "bg-white border-b border-gray-200 sticky top-0 z-50"}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Mobile Header Bar - Logo left, Hamburger right */}
                 {!isHomePage && (
-                    <div className="relative py-6 border-b border-gray-100">
-                        <Link href="/" className="absolute left-4 sm:left-6 lg:left-8 flex flex-col items-start">
+                    <div className="lg:hidden flex justify-between items-center py-4">
+                        <Link href="/" className="flex flex-col items-start">
                             <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-light text-gray-900">first</span>
-                                <span className="text-3xl italic text-brand-red" style={{ fontFamily: 'Georgia, serif' }}>models</span>
+                                <span className="text-2xl font-light text-gray-900">primeface</span>
+                                <span className="text-2xl italic text-brand-red" style={{ fontFamily: 'Georgia, serif' }}>models</span>
                             </div>
-                            <span className="text-[9px] tracking-[0.2em] text-gray-600 uppercase">and talent agency</span>
+                            <span className="text-[8px] tracking-[0.2em] text-gray-600 uppercase">and talent agency</span>
                         </Link>
 
-                        <nav className="hidden lg:flex items-center justify-center space-x-8">
-                            <Link href="/female-fashion" className="text-gray-800 hover:text-brand-red transition text-xs font-medium tracking-wider uppercase">FEMALE MODELS</Link>
-                            <Link href="/male-fashion" className="text-gray-800 hover:text-brand-red transition text-xs font-medium tracking-wider uppercase">MALE MODELS</Link>
-                            <Link href="/children-male" className="text-gray-800 hover:text-brand-red transition text-xs font-medium tracking-wider uppercase">CHILDREN</Link>
-                            <Link href="/our-work" className="text-gray-800 hover:text-brand-red transition text-xs font-medium tracking-wider uppercase">OUR WORK</Link>
-                            <Link href="/become-a-model" className="text-gray-800 hover:text-brand-red transition text-xs font-medium tracking-wider uppercase">BECOME A MODEL</Link>
-                            <Link href="/contact" className="text-gray-800 hover:text-brand-red transition text-xs font-medium tracking-wider uppercase">CONTACT</Link>
-                        </nav>
-
-                        <div className="absolute right-4 sm:right-6 lg:right-8 hidden lg:flex items-center space-x-4">
-                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-800 hover:text-brand-red transition">
-                                <Instagram size={20} />
-                            </a>
-                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-800 hover:text-brand-red transition">
-                                <Facebook size={20} />
-                            </a>
-                        </div>
-
+                        {/* Animated Hamburger Button */}
                         <button
-                            className="lg:hidden absolute right-4 sm:right-6 lg:right-8 text-gray-900"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className="w-10 h-10 flex flex-col justify-center items-center"
                             aria-label="Toggle menu"
                         >
-                            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            <motion.span
+                                animate={isMenuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+                                className="w-6 h-0.5 bg-gray-800 block mb-1.5"
+                                transition={{ duration: 0.3 }}
+                            />
+                            <motion.span
+                                animate={isMenuOpen ? { opacity: 0, x: -20 } : { opacity: 1, x: 0 }}
+                                className="w-6 h-0.5 bg-gray-800 block mb-1.5"
+                                transition={{ duration: 0.3 }}
+                            />
+                            <motion.span
+                                animate={isMenuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+                                className="w-6 h-0.5 bg-gray-800 block"
+                                transition={{ duration: 0.3 }}
+                            />
                         </button>
                     </div>
                 )}
 
-                {isHomePage && (
-                    <Link href="/" className="absolute left-4 sm:left-6 lg:left-8 top-6">
-                        <Image
-                            src="/primeface_logo.png"
-                            alt="PrimeFace Models"
-                            width={200}
-                            height={60}
-                            className="h-12 w-auto"
-                            priority
-                        />
-                    </Link>
+                {/* Desktop Logo - Centered */}
+                {!isHomePage && (
+                    <div className="hidden lg:block text-center py-6 border-b border-gray-100">
+                        <Link href="/" className="flex flex-col items-center">
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-3xl font-light text-gray-900">primeface</span>
+                                <span className="text-3xl italic text-brand-red" style={{ fontFamily: 'Georgia, serif' }}>models</span>
+                            </div>
+                            <span className="text-[9px] tracking-[0.2em] text-gray-600 uppercase">and talent agency</span>
+                        </Link>
+                    </div>
                 )}
 
-                <div className="flex justify-center items-center py-4">
-                    <nav className="hidden lg:flex items-center space-x-8">
-                        <Link href="/female-fashion" className={`${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-800 hover:text-brand-red'} transition text-xs font-medium tracking-wider uppercase`}>FEMALE MODELS</Link>
-                        <Link href="/male-fashion" className={`${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-800 hover:text-brand-red'} transition text-xs font-medium tracking-wider uppercase`}>MALE MODELS</Link>
-                        <Link href="/children-male" className={`${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-800 hover:text-brand-red'} transition text-xs font-medium tracking-wider uppercase`}>CHILDREN</Link>
-                        <Link href="/our-work" className={`${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-800 hover:text-brand-red'} transition text-xs font-medium tracking-wider uppercase`}>OUR WORK</Link>
-                        <Link href="/become-a-model" className={`${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-800 hover:text-brand-red'} transition text-xs font-medium tracking-wider uppercase`}>BECOME A MODEL</Link>
-                        <Link href="/contact" className={`${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-800 hover:text-brand-red'} transition text-xs font-medium tracking-wider uppercase`}>CONTACT</Link>
+                {isHomePage && (
+                    <div className="text-center py-6">
+                        <Link href="/" className="flex flex-col items-center">
+                            <Image
+                                src="/primeface_logo.png"
+                                alt="PrimeFace Models"
+                                width={200}
+                                height={60}
+                                className="h-12 w-auto"
+                                priority
+                            />
+                        </Link>
+                    </div>
+                )}
+
+                {/* Desktop Navigation */}
+                <div className="hidden lg:flex justify-center items-center py-4">
+                    <nav className="flex items-center space-x-8">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={`${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-800 hover:text-brand-red'} transition text-xs font-medium tracking-wider uppercase`}
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
                     </nav>
 
-                    <div className="absolute right-4 sm:right-6 lg:right-8 hidden lg:flex items-center space-x-4">
+                    <div className="absolute right-4 sm:right-6 lg:right-8 flex items-center space-x-4">
                         <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={`${isHomePage ? 'text-white/80 hover:text-white' : 'text-gray-800 hover:text-brand-red'} transition`}>
                             <Instagram size={20} />
                         </a>
@@ -83,28 +110,61 @@ export default function Header() {
                             <Facebook size={20} />
                         </a>
                     </div>
-
-                    <button
-                        className={`lg:hidden ${isHomePage ? 'text-white' : 'text-gray-900'}`}
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        aria-label="Toggle menu"
-                    >
-                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
                 </div>
 
-                {isMenuOpen && (
-                    <nav className={`lg:hidden pb-6 ${isHomePage ? 'bg-black/90 backdrop-blur-md' : 'bg-white'} -mx-4 px-4`}>
-                        <div className="space-y-1">
-                            <Link href="/female-fashion" className={`block py-3 ${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-700 hover:text-brand-red'} text-sm font-medium tracking-wide`} onClick={() => setIsMenuOpen(false)}>FEMALE MODELS</Link>
-                            <Link href="/male-fashion" className={`block py-3 ${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-700 hover:text-brand-red'} text-sm font-medium tracking-wide`} onClick={() => setIsMenuOpen(false)}>MALE MODELS</Link>
-                            <Link href="/children-male" className={`block py-3 ${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-700 hover:text-brand-red'} text-sm font-medium tracking-wide`} onClick={() => setIsMenuOpen(false)}>CHILDREN</Link>
-                            <Link href="/our-work" className={`block py-3 ${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-700 hover:text-brand-red'} text-sm font-medium tracking-wide`} onClick={() => setIsMenuOpen(false)}>OUR WORK</Link>
-                            <Link href="/become-a-model" className={`block py-3 ${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-700 hover:text-brand-red'} text-sm font-medium tracking-wide`} onClick={() => setIsMenuOpen(false)}>BECOME A MODEL</Link>
-                            <Link href="/contact" className={`block py-3 ${isHomePage ? 'text-white/90 hover:text-white' : 'text-gray-700 hover:text-brand-red'} text-sm font-medium tracking-wide`} onClick={() => setIsMenuOpen(false)}>CONTACT</Link>
-                        </div>
-                    </nav>
-                )}
+                {/* Mobile Menu Overlay */}
+                <AnimatePresence>
+                    {isMenuOpen && !isHomePage && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="lg:hidden fixed inset-0 top-[72px] bg-white/95 backdrop-blur-md z-40 flex flex-col items-center justify-start pt-12"
+                        >
+                            <motion.nav
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 20 }}
+                                transition={{ duration: 0.3, delay: 0.1 }}
+                                className="flex flex-col items-center gap-6"
+                            >
+                                {navLinks.map((link, index) => (
+                                    <motion.div
+                                        key={link.href}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
+                                    >
+                                        <Link
+                                            href={link.href}
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className="text-xl tracking-wider text-gray-700 hover:text-brand-red transition"
+                                        >
+                                            {link.name}
+                                        </Link>
+                                    </motion.div>
+                                ))}
+                            </motion.nav>
+
+                            {/* Social Icons in Mobile Menu */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: 0.4 }}
+                                className="flex gap-6 mt-8"
+                            >
+                                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-brand-red transition">
+                                    <Instagram size={24} />
+                                </a>
+                                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-brand-red transition">
+                                    <Facebook size={24} />
+                                </a>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </header>
     )

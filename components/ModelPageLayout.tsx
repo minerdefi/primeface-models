@@ -1,5 +1,8 @@
+'use client'
+
 import PageHeader from './PageHeader'
 import ModelGrid from './ModelGrid'
+import { motion } from 'framer-motion'
 
 interface Model {
     id: string
@@ -16,10 +19,9 @@ interface ModelPageLayoutProps {
     category: 'female' | 'male' | 'children'
     subcategory: string
     models: Model[]
-    backgroundImage?: string
 }
 
-export default function ModelPageLayout({ title, category, subcategory, models, backgroundImage }: ModelPageLayoutProps) {
+export default function ModelPageLayout({ title, category, subcategory, models }: ModelPageLayoutProps) {
     const getTabs = () => {
         if (category === 'female') {
             return [
@@ -42,15 +44,14 @@ export default function ModelPageLayout({ title, category, subcategory, models, 
         ]
     }
 
-    const getBackgroundImage = () => {
-        if (backgroundImage) return backgroundImage
-        if (category === 'female') return 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1920&q=80'
-        if (category === 'male') return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=80'
-        return 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=1920&q=80'
+    const getBreadcrumbs = () => {
+        return [
+            { label: title, href: undefined },
+            { label: subcategory.charAt(0).toUpperCase() + subcategory.slice(1) }
+        ]
     }
 
     const getSubtitle = () => {
-        if (category === 'children') return `${subcategory.charAt(0).toUpperCase() + subcategory.slice(1)} Division`
         return `${subcategory.charAt(0).toUpperCase() + subcategory.slice(1)} Division`
     }
 
@@ -59,14 +60,19 @@ export default function ModelPageLayout({ title, category, subcategory, models, 
             <PageHeader
                 title={title}
                 subtitle={getSubtitle()}
-                backgroundImage={getBackgroundImage()}
+                breadcrumbs={getBreadcrumbs()}
                 tabs={getTabs()}
             />
-            <section className="py-16 bg-white">
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="py-16 bg-white"
+            >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <ModelGrid models={models} />
                 </div>
-            </section>
+            </motion.section>
         </main>
     )
 }

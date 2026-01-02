@@ -19,8 +19,8 @@ export default function ModelGrid({ models, columns = 4 }: ModelGridProps) {
     const gridCols = columns === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'
 
     return (
-        <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols} gap-6`}>
-            {models.map((model) => (
+        <div className={`grid grid-cols-2 ${gridCols} gap-6`}>
+            {models.map((model, index) => (
                 <ModelCard
                     key={model.id}
                     name={model.name}
@@ -29,6 +29,7 @@ export default function ModelGrid({ models, columns = 4 }: ModelGridProps) {
                     slug={model.slug}
                     height={model.height}
                     measurements={model.measurements}
+                    index={index}
                 />
             ))}
         </div>

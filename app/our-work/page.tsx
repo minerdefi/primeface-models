@@ -1,6 +1,9 @@
+"use client";
+
 import PageHeader from "@/components/PageHeader";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function OurWorkPage() {
     const portfolioItems = [
@@ -19,14 +22,20 @@ export default function OurWorkPage() {
             <PageHeader
                 title="Our Work"
                 subtitle="Portfolio & Campaigns"
-                backgroundImage="https://images.unsplash.com/photo-1558769132-cb1aea3c8565?w=1920&q=80"
+                breadcrumbs={[{ label: "Our Work" }]}
             />
 
             <section className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {portfolioItems.map((item) => (
-                            <div key={item.id} className="group relative overflow-hidden aspect-[3/4] bg-gray-100 cursor-pointer">
+                    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {portfolioItems.map((item, index) => (
+                            <motion.div
+                                key={item.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                                className="group relative overflow-hidden aspect-[3/4] bg-gray-100 cursor-pointer"
+                            >
                                 <Image
                                     src={item.image}
                                     alt={item.title}
@@ -39,13 +48,18 @@ export default function OurWorkPage() {
                                         <p className="text-sm text-white/70 uppercase tracking-wide">{item.category}</p>
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            <section className="py-20 bg-gray-50">
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+                className="py-20 bg-gray-50"
+            >
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 className="text-3xl font-bold mb-6 text-brand-red">Ready to Work Together?</h2>
                     <p className="text-lg text-gray-600 mb-8">
@@ -53,12 +67,12 @@ export default function OurWorkPage() {
                     </p>
                     <Link
                         href="/contact"
-                        className="inline-block bg-black text-white px-10 py-4 font-medium hover:bg-gray-800 transition uppercase tracking-wide"
+                        className="inline-block bg-white text-brand-red border-2 border-brand-red px-10 py-4 font-medium hover:bg-brand-red hover:text-white transition uppercase tracking-wide"
                     >
                         Get in Touch
                     </Link>
                 </div>
-            </section>
+            </motion.section>
         </main>
     );
 }
