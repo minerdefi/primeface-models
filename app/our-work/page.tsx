@@ -63,7 +63,7 @@ export default function OurWorkPage() {
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 className="text-3xl font-bold mb-6 text-brand-red">Ready to Work Together?</h2>
                     <p className="text-lg text-gray-600 mb-8">
-                        Let's create something amazing. Contact us to discuss your next project.
+                        Let&apos;s create something amazing. Contact us to discuss your next project.
                     </p>
                     <Link
                         href="/contact"

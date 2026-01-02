@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import Image from 'next/image'
-import { Plus, Search, Edit2, Trash2, X, Eye, Star, Loader2, Upload, Image as ImageIcon, AlertCircle } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, X, Star, Loader2, Upload, AlertCircle } from 'lucide-react'
 import { compressImage } from '@/lib/image-compression'
 
 interface Model {
@@ -61,7 +61,7 @@ export default function ModelsPage() {
     })
 
     const [uploadingImages, setUploadingImages] = useState<boolean[]>([])
-    const [imageFiles, setImageFiles] = useState<File[]>([])
+    const [imageFiles] = useState<File[]>([])
     const [saveError, setSaveError] = useState<string | null>(null)
 
     useEffect(() => {
@@ -137,9 +137,9 @@ export default function ModelsPage() {
 
             await fetchModels()
             closeModal()
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Save error:', error)
-            setSaveError(error.message || 'Failed to save model')
+            setSaveError(error instanceof Error ? error.message : 'Failed to save model')
         } finally {
             setIsSaving(false)
         }

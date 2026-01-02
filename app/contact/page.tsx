@@ -76,7 +76,7 @@ export default function ContactPage() {
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 className="text-3xl font-bold mb-6 text-brand-red">Interested in Becoming a Model?</h2>
                     <p className="text-lg text-gray-600 mb-8">
-                        If you're interested in joining our agency, please visit our application page.
+                        If you&apos;re interested in joining our agency, please visit our application page.
                     </p>
                     <Link
                         href="/become-a-model"

@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { Search, Mail, Phone, X, CheckCircle, MessageCircle, Trash2 } from 'lucide-react'
+import { Search, Mail, Phone, X, MessageCircle, Trash2 } from 'lucide-react'
 
 interface Contact {
     id: string
@@ -23,11 +23,7 @@ export default function ContactsPage() {
     const [statusFilter, setStatusFilter] = useState('all')
     const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
 
-    useEffect(() => {
-        fetchContacts()
-    }, [])
-
-    const fetchContacts = async () => {
+    const fetchContacts = useCallback(async () => {
         const { data, error } = await supabase
             .from('contact_submissions')
             .select('*')
@@ -37,7 +33,11 @@ export default function ContactsPage() {
             setContacts(data)
         }
         setIsLoading(false)
-    }
+    }, [])
+
+    useEffect(() => {
+        fetchContacts()
+    }, [fetchContacts])
 
     const updateStatus = async (id: string, status: string) => {
         const { error } = await supabase
@@ -287,8 +287,8 @@ export default function ContactsPage() {
                                                 key={status}
                                                 onClick={() => updateStatus(selectedContact.id, status)}
                                                 className={`px-4 py-2 rounded-lg border capitalize transition ${selectedContact.status === status
-                                                        ? getStatusColor(status)
-                                                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                                                    ? getStatusColor(status)
+                                                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                                                     }`}
                                             >
                                                 {status}

@@ -4,10 +4,10 @@ import { supabase } from '@/lib/supabase'
 // GET - Get a single model by slug
 export async function GET(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
-        const { slug } = params
+        const { slug } = await params
 
         const { data, error } = await supabase
             .from('models')
@@ -36,10 +36,10 @@ export async function GET(
 // PUT - Update a model (admin only)
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
-        const { slug } = params
+        const { slug } = await params
         const body = await request.json()
 
         const {
@@ -120,10 +120,10 @@ export async function PUT(
 // DELETE - Soft delete a model (admin only)
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
-        const { slug } = params
+        const { slug } = await params
 
         // Soft delete by setting active to false
         const { data, error } = await supabase

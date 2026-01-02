@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import Image from 'next/image'
-import { Search, Eye, X, Check, XCircle, Clock, CheckCircle, Filter } from 'lucide-react'
+import { Search, Eye, X, Check, XCircle, Clock, CheckCircle } from 'lucide-react'
 
 interface Application {
     id: string
@@ -42,11 +42,7 @@ export default function ApplicationsPage() {
     const [selectedApp, setSelectedApp] = useState<Application | null>(null)
     const [adminNotes, setAdminNotes] = useState('')
 
-    useEffect(() => {
-        fetchApplications()
-    }, [])
-
-    const fetchApplications = async () => {
+    const fetchApplications = useCallback(async () => {
         const { data, error } = await supabase
             .from('model_applications')
             .select('*')
@@ -56,7 +52,11 @@ export default function ApplicationsPage() {
             setApplications(data)
         }
         setIsLoading(false)
-    }
+    }, [])
+
+    useEffect(() => {
+        fetchApplications()
+    }, [fetchApplications])
 
     const updateStatus = async (id: string, status: string) => {
         const { error } = await supabase
@@ -396,8 +396,8 @@ export default function ApplicationsPage() {
                                     <button
                                         onClick={() => updateStatus(selectedApp.id, 'reviewed')}
                                         className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition ${selectedApp.status === 'reviewed'
-                                                ? 'bg-blue-500 text-white border-blue-500'
-                                                : 'border-blue-500 text-blue-500 hover:bg-blue-50'
+                                            ? 'bg-blue-500 text-white border-blue-500'
+                                            : 'border-blue-500 text-blue-500 hover:bg-blue-50'
                                             }`}
                                     >
                                         <Eye size={18} />
@@ -406,8 +406,8 @@ export default function ApplicationsPage() {
                                     <button
                                         onClick={() => updateStatus(selectedApp.id, 'accepted')}
                                         className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition ${selectedApp.status === 'accepted'
-                                                ? 'bg-green-500 text-white border-green-500'
-                                                : 'border-green-500 text-green-500 hover:bg-green-50'
+                                            ? 'bg-green-500 text-white border-green-500'
+                                            : 'border-green-500 text-green-500 hover:bg-green-50'
                                             }`}
                                     >
                                         <Check size={18} />
@@ -416,8 +416,8 @@ export default function ApplicationsPage() {
                                     <button
                                         onClick={() => updateStatus(selectedApp.id, 'rejected')}
                                         className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition ${selectedApp.status === 'rejected'
-                                                ? 'bg-red-500 text-white border-red-500'
-                                                : 'border-red-500 text-red-500 hover:bg-red-50'
+                                            ? 'bg-red-500 text-white border-red-500'
+                                            : 'border-red-500 text-red-500 hover:bg-red-50'
                                             }`}
                                     >
                                         <XCircle size={18} />
