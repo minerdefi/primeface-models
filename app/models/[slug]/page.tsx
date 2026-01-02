@@ -3,21 +3,25 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { Info, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 
-// Sample model data - will be replaced with API data
-const modelData = {
+// Fallback model data if not found in database
+const fallbackModelData = {
     name: 'ABDUL S',
     slug: 'abdul-s',
     measurements: {
         height: "6'1\"",
         chest: '34"',
         waist: '33"',
+        bust: '',
+        hips: '',
         inseam: '34"',
         suit: '32"',
         suitLength: 'L',
+        dressSize: '',
         shoe: '11.5 US',
         hair: 'Brown',
         eyes: 'Brown'
@@ -32,9 +36,59 @@ const modelData = {
 }
 
 export default function ModelPage() {
+    const params = useParams()
+    const slug = params.slug as string
     const router = useRouter()
     const [showMeasurements, setShowMeasurements] = useState(false)
     const [selectedImage, setSelectedImage] = useState<number | null>(null)
+    const [modelData, setModelData] = useState(fallbackModelData)
+    const [isLoading, setIsLoading] = useState(true)
+
+    // Fetch model data from database
+    useEffect(() => {
+        const fetchModel = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('models')
+                    .select('*')
+                    .eq('slug', slug)
+                    .eq('active', true)
+                    .single()
+
+                if (error) throw error
+
+                if (data) {
+                    // Transform database model to component format
+                    setModelData({
+                        name: data.name.toUpperCase(),
+                        slug: data.slug,
+                        measurements: {
+                            height: data.height || '',
+                            chest: data.chest || '',
+                            waist: data.waist || '',
+                            bust: data.bust || '',
+                            hips: data.hips || '',
+                            inseam: data.inseam || '',
+                            suit: data.suit || '',
+                            suitLength: data.suit_length || '',
+                            dressSize: data.dress_size || '',
+                            shoe: data.shoe_size || '',
+                            hair: data.hair_color || '',
+                            eyes: data.eye_color || ''
+                        },
+                        images: data.images && data.images.length > 0 ? data.images : fallbackModelData.images
+                    })
+                }
+            } catch (error) {
+                console.error('Error fetching model:', error)
+                // Keep fallback data on error
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchModel()
+    }, [slug])
 
     // Handle keyboard navigation
     useEffect(() => {
@@ -60,6 +114,14 @@ export default function ModelPage() {
 
     const handleNextImage = () => {
         setSelectedImage(prev => prev! < modelData.images.length - 1 ? prev! + 1 : 0)
+    }
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-red"></div>
+            </div>
+        )
     }
 
     return (
@@ -134,15 +196,18 @@ export default function ModelPage() {
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="mt-4 hidden md:flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-gray-600"
                     >
-                        <span>Height <strong className="text-gray-900">{modelData.measurements.height}</strong></span>
-                        <span>Chest <strong className="text-gray-900">{modelData.measurements.chest}</strong></span>
-                        <span>Waist <strong className="text-gray-900">{modelData.measurements.waist}</strong></span>
-                        <span>Inseam <strong className="text-gray-900">{modelData.measurements.inseam}</strong></span>
-                        <span>Suit <strong className="text-gray-900">{modelData.measurements.suit}</strong></span>
-                        <span>Suit Length <strong className="text-gray-900">{modelData.measurements.suitLength}</strong></span>
-                        <span>Shoe <strong className="text-gray-900">{modelData.measurements.shoe}</strong></span>
-                        <span>Hair <strong className="text-gray-900">{modelData.measurements.hair}</strong></span>
-                        <span>Eyes <strong className="text-gray-900">{modelData.measurements.eyes}</strong></span>
+                        {modelData.measurements.height && <span>Height <strong className="text-gray-900">{modelData.measurements.height}</strong></span>}
+                        {modelData.measurements.bust && <span>Bust <strong className="text-gray-900">{modelData.measurements.bust}</strong></span>}
+                        {modelData.measurements.chest && <span>Chest <strong className="text-gray-900">{modelData.measurements.chest}</strong></span>}
+                        {modelData.measurements.waist && <span>Waist <strong className="text-gray-900">{modelData.measurements.waist}</strong></span>}
+                        {modelData.measurements.hips && <span>Hips <strong className="text-gray-900">{modelData.measurements.hips}</strong></span>}
+                        {modelData.measurements.dressSize && <span>Dress Size <strong className="text-gray-900">{modelData.measurements.dressSize}</strong></span>}
+                        {modelData.measurements.inseam && <span>Inseam <strong className="text-gray-900">{modelData.measurements.inseam}</strong></span>}
+                        {modelData.measurements.suit && <span>Suit <strong className="text-gray-900">{modelData.measurements.suit}</strong></span>}
+                        {modelData.measurements.suitLength && <span>Suit Length <strong className="text-gray-900">{modelData.measurements.suitLength}</strong></span>}
+                        {modelData.measurements.shoe && <span>Shoe <strong className="text-gray-900">{modelData.measurements.shoe}</strong></span>}
+                        {modelData.measurements.hair && <span>Hair <strong className="text-gray-900">{modelData.measurements.hair}</strong></span>}
+                        {modelData.measurements.eyes && <span>Eyes <strong className="text-gray-900">{modelData.measurements.eyes}</strong></span>}
                     </motion.div>
 
                     {/* Measurements - Mobile Dropdown */}
@@ -156,15 +221,18 @@ export default function ModelPage() {
                                 className="mt-4 overflow-hidden md:hidden"
                             >
                                 <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-gray-600 px-4">
-                                    <span>Height <strong className="text-gray-900">{modelData.measurements.height}</strong></span>
-                                    <span>Chest <strong className="text-gray-900">{modelData.measurements.chest}</strong></span>
-                                    <span>Waist <strong className="text-gray-900">{modelData.measurements.waist}</strong></span>
-                                    <span>Inseam <strong className="text-gray-900">{modelData.measurements.inseam}</strong></span>
-                                    <span>Suit <strong className="text-gray-900">{modelData.measurements.suit}</strong></span>
-                                    <span>Suit Length <strong className="text-gray-900">{modelData.measurements.suitLength}</strong></span>
-                                    <span>Shoe <strong className="text-gray-900">{modelData.measurements.shoe}</strong></span>
-                                    <span>Hair <strong className="text-gray-900">{modelData.measurements.hair}</strong></span>
-                                    <span>Eyes <strong className="text-gray-900">{modelData.measurements.eyes}</strong></span>
+                                    {modelData.measurements.height && <span>Height <strong className="text-gray-900">{modelData.measurements.height}</strong></span>}
+                                    {modelData.measurements.bust && <span>Bust <strong className="text-gray-900">{modelData.measurements.bust}</strong></span>}
+                                    {modelData.measurements.chest && <span>Chest <strong className="text-gray-900">{modelData.measurements.chest}</strong></span>}
+                                    {modelData.measurements.waist && <span>Waist <strong className="text-gray-900">{modelData.measurements.waist}</strong></span>}
+                                    {modelData.measurements.hips && <span>Hips <strong className="text-gray-900">{modelData.measurements.hips}</strong></span>}
+                                    {modelData.measurements.dressSize && <span>Dress Size <strong className="text-gray-900">{modelData.measurements.dressSize}</strong></span>}
+                                    {modelData.measurements.inseam && <span>Inseam <strong className="text-gray-900">{modelData.measurements.inseam}</strong></span>}
+                                    {modelData.measurements.suit && <span>Suit <strong className="text-gray-900">{modelData.measurements.suit}</strong></span>}
+                                    {modelData.measurements.suitLength && <span>Suit Length <strong className="text-gray-900">{modelData.measurements.suitLength}</strong></span>}
+                                    {modelData.measurements.shoe && <span>Shoe <strong className="text-gray-900">{modelData.measurements.shoe}</strong></span>}
+                                    {modelData.measurements.hair && <span>Hair <strong className="text-gray-900">{modelData.measurements.hair}</strong></span>}
+                                    {modelData.measurements.eyes && <span>Eyes <strong className="text-gray-900">{modelData.measurements.eyes}</strong></span>}
                                 </div>
                             </motion.div>
                         )}

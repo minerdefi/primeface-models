@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import Image from 'next/image'
-import { Plus, Search, Edit2, Trash2, X, Eye, Star, Loader2 } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, X, Eye, Star, Loader2, Upload, Image as ImageIcon, AlertCircle } from 'lucide-react'
+import { compressImage } from '@/lib/image-compression'
 
 interface Model {
     id: string
@@ -13,6 +14,17 @@ interface Model {
     category: string
     subcategory: string | null
     height: string | null
+    chest: string | null
+    waist: string | null
+    bust: string | null
+    hips: string | null
+    inseam: string | null
+    suit: string | null
+    suit_length: string | null
+    dress_size: string | null
+    shoe_size: string | null
+    hair_color: string | null
+    eye_color: string | null
     images: string[]
     featured: boolean
     active: boolean
@@ -31,18 +43,26 @@ export default function ModelsPage() {
     const [formData, setFormData] = useState({
         name: '',
         category: 'women',
-        subcategory: 'main-board',
+        subcategory: 'fashion',
         height: '',
         chest: '',
         waist: '',
         bust: '',
         hips: '',
+        inseam: '',
+        suit: '',
+        suitLength: '',
+        dressSize: '',
         shoeSize: '',
         hairColor: '',
         eyeColor: '',
         images: [''],
         featured: false
     })
+
+    const [uploadingImages, setUploadingImages] = useState<boolean[]>([])
+    const [imageFiles, setImageFiles] = useState<File[]>([])
+    const [saveError, setSaveError] = useState<string | null>(null)
 
     useEffect(() => {
         fetchModels()
@@ -63,47 +83,66 @@ export default function ModelsPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsSaving(true)
+        setSaveError(null)
 
-        const modelData = {
-            name: formData.name,
-            slug: formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-            category: formData.category,
-            subcategory: formData.subcategory,
-            height: formData.height,
-            chest: formData.chest,
-            waist: formData.waist,
-            bust: formData.bust,
-            hips: formData.hips,
-            shoe_size: formData.shoeSize,
-            hair_color: formData.hairColor,
-            eye_color: formData.eyeColor,
-            images: formData.images.filter(img => img.trim() !== ''),
-            featured: formData.featured,
-            active: true
-        }
-
-        if (editingModel) {
-            const { error } = await supabase
-                .from('models')
-                .update(modelData)
-                .eq('id', editingModel.id)
-
-            if (!error) {
-                fetchModels()
-                closeModal()
+        try {
+            const modelData = {
+                name: formData.name,
+                slug: formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+                category: formData.category,
+                subcategory: formData.subcategory,
+                height: formData.height || null,
+                chest: formData.chest || null,
+                waist: formData.waist || null,
+                bust: formData.bust || null,
+                hips: formData.hips || null,
+                inseam: formData.inseam || null,
+                suit: formData.suit || null,
+                suit_length: formData.suitLength || null,
+                dress_size: formData.dressSize || null,
+                shoe_size: formData.shoeSize || null,
+                hair_color: formData.hairColor || null,
+                eye_color: formData.eyeColor || null,
+                images: formData.images.filter(img => img.trim() !== ''),
+                featured: formData.featured,
+                active: true
             }
-        } else {
-            const { error } = await supabase
-                .from('models')
-                .insert(modelData)
 
-            if (!error) {
-                fetchModels()
-                closeModal()
+            console.log('Saving model data:', modelData)
+
+            if (editingModel) {
+                const { data, error } = await supabase
+                    .from('models')
+                    .update(modelData)
+                    .eq('id', editingModel.id)
+                    .select()
+
+                if (error) {
+                    console.error('Update error:', error)
+                    throw new Error(error.message)
+                }
+                console.log('Model updated:', data)
+            } else {
+                const { data, error } = await supabase
+                    .from('models')
+                    .insert(modelData)
+                    .select()
+
+                if (error) {
+                    console.error('Insert error:', error)
+                    throw new Error(error.message)
+                }
+                console.log('Model created:', data)
             }
-        }
 
-        setIsSaving(false)
+            await fetchModels()
+            closeModal()
+        } catch (error: any) {
+            console.error('Save error:', error)
+            setSaveError(error.message || 'Failed to save model')
+        } finally {
+            setIsSaving(false)
+        }
     }
 
     const handleDelete = async (id: string) => {
@@ -135,20 +174,37 @@ export default function ModelsPage() {
         setFormData({
             name: model.name,
             category: model.category,
-            subcategory: model.subcategory || 'main-board',
+            subcategory: model.subcategory || 'fashion',
             height: model.height || '',
-            chest: '',
-            waist: '',
-            bust: '',
-            hips: '',
-            shoeSize: '',
-            hairColor: '',
-            eyeColor: '',
+            chest: model.chest || '',
+            waist: model.waist || '',
+            bust: model.bust || '',
+            hips: model.hips || '',
+            inseam: model.inseam || '',
+            suit: model.suit || '',
+            suitLength: model.suit_length || '',
+            dressSize: model.dress_size || '',
+            shoeSize: model.shoe_size || '',
+            hairColor: model.hair_color || '',
+            eyeColor: model.eye_color || '',
             images: model.images.length > 0 ? model.images : [''],
             featured: model.featured
         })
         setShowModal(true)
     }
+
+    // Update subcategory when category changes
+    useEffect(() => {
+        if (formData.category === 'women' || formData.category === 'men') {
+            if (!['fashion', 'commercial', 'classic'].includes(formData.subcategory)) {
+                setFormData(prev => ({ ...prev, subcategory: 'fashion' }))
+            }
+        } else if (formData.category === 'kids') {
+            if (!['boys', 'girls', 'tween'].includes(formData.subcategory)) {
+                setFormData(prev => ({ ...prev, subcategory: 'boys' }))
+            }
+        }
+    }, [formData.category])
 
     const closeModal = () => {
         setShowModal(false)
@@ -156,12 +212,16 @@ export default function ModelsPage() {
         setFormData({
             name: '',
             category: 'women',
-            subcategory: 'main-board',
+            subcategory: 'fashion',
             height: '',
             chest: '',
             waist: '',
             bust: '',
             hips: '',
+            inseam: '',
+            suit: '',
+            suitLength: '',
+            dressSize: '',
             shoeSize: '',
             hairColor: '',
             eyeColor: '',
@@ -172,12 +232,54 @@ export default function ModelsPage() {
 
     const addImageField = () => {
         setFormData({ ...formData, images: [...formData.images, ''] })
+        setUploadingImages([...uploadingImages, false])
     }
 
     const updateImage = (index: number, value: string) => {
         const newImages = [...formData.images]
         newImages[index] = value
         setFormData({ ...formData, images: newImages })
+    }
+
+    const removeImage = (index: number) => {
+        const newImages = formData.images.filter((_, i) => i !== index)
+        const newUploading = uploadingImages.filter((_, i) => i !== index)
+        setFormData({ ...formData, images: newImages })
+        setUploadingImages(newUploading)
+    }
+
+    const handleImageUpload = async (index: number, file: File) => {
+        const newUploading = [...uploadingImages]
+        newUploading[index] = true
+        setUploadingImages(newUploading)
+
+        try {
+            // Compress image before upload
+            console.log('Compressing image...')
+            const compressedFile = await compressImage(file, 1, 1920)
+
+            const formDataUpload = new FormData()
+            formDataUpload.append('file', compressedFile)
+            formDataUpload.append('bucket', 'model-images')
+
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formDataUpload,
+            })
+
+            if (!response.ok) {
+                throw new Error('Upload failed')
+            }
+
+            const data = await response.json()
+            updateImage(index, data.url)
+        } catch (error) {
+            console.error('Upload error:', error)
+            alert('Failed to upload image: ' + (error as Error).message)
+        } finally {
+            newUploading[index] = false
+            setUploadingImages(newUploading)
+        }
     }
 
     const filteredModels = models
@@ -365,13 +467,18 @@ export default function ModelsPage() {
                                             onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
                                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-red"
                                         >
-                                            <option value="main-board">Main Board</option>
-                                            <option value="development">Development</option>
-                                            <option value="direct-booking">Direct Booking</option>
+                                            {(formData.category === 'women' || formData.category === 'men') && (
+                                                <>
+                                                    <option value="fashion">Fashion</option>
+                                                    <option value="commercial">Commercial</option>
+                                                    <option value="classic">Classic</option>
+                                                </>
+                                            )}
                                             {formData.category === 'kids' && (
                                                 <>
-                                                    <option value="girls">Girls</option>
                                                     <option value="boys">Boys</option>
+                                                    <option value="girls">Girls</option>
+                                                    <option value="tween">Tween</option>
                                                 </>
                                             )}
                                         </select>
@@ -422,6 +529,61 @@ export default function ModelsPage() {
                                     </div>
 
                                     <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Chest</label>
+                                        <input
+                                            type="text"
+                                            value={formData.chest}
+                                            onChange={(e) => setFormData({ ...formData, chest: e.target.value })}
+                                            placeholder="34&quot;"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-red"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Inseam</label>
+                                        <input
+                                            type="text"
+                                            value={formData.inseam}
+                                            onChange={(e) => setFormData({ ...formData, inseam: e.target.value })}
+                                            placeholder="32&quot;"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-red"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Suit</label>
+                                        <input
+                                            type="text"
+                                            value={formData.suit}
+                                            onChange={(e) => setFormData({ ...formData, suit: e.target.value })}
+                                            placeholder="40R"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-red"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Suit Length</label>
+                                        <input
+                                            type="text"
+                                            value={formData.suitLength}
+                                            onChange={(e) => setFormData({ ...formData, suitLength: e.target.value })}
+                                            placeholder="R"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-red"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Dress Size</label>
+                                        <input
+                                            type="text"
+                                            value={formData.dressSize}
+                                            onChange={(e) => setFormData({ ...formData, dressSize: e.target.value })}
+                                            placeholder="6"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-red"
+                                        />
+                                    </div>
+
+                                    <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Shoe Size</label>
                                         <input
                                             type="text"
@@ -457,23 +619,79 @@ export default function ModelsPage() {
 
                                 {/* Images */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Image URLs</label>
-                                    {formData.images.map((img, index) => (
-                                        <input
-                                            key={index}
-                                            type="url"
-                                            value={img}
-                                            onChange={(e) => updateImage(index, e.target.value)}
-                                            placeholder="https://..."
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-red mb-2"
-                                        />
-                                    ))}
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Images</label>
+                                    <div className="space-y-3">
+                                        {formData.images.map((img, index) => (
+                                            <div key={index} className="flex gap-2">
+                                                {/* Preview */}
+                                                {img && (
+                                                    <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                                        <Image
+                                                            src={img}
+                                                            alt={`Preview ${index + 1}`}
+                                                            width={80}
+                                                            height={80}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                <div className="flex-1 flex gap-2">
+                                                    {/* File Upload */}
+                                                    <label className="flex-1 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-brand-red transition cursor-pointer flex items-center justify-center gap-2 text-sm text-gray-600 hover:text-brand-red">
+                                                        {uploadingImages[index] ? (
+                                                            <>
+                                                                <Loader2 size={16} className="animate-spin" />
+                                                                Uploading...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Upload size={16} />
+                                                                Upload Image
+                                                            </>
+                                                        )}
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0]
+                                                                if (file) handleImageUpload(index, file)
+                                                            }}
+                                                            className="hidden"
+                                                            disabled={uploadingImages[index]}
+                                                        />
+                                                    </label>
+
+                                                    {/* URL Input */}
+                                                    <input
+                                                        type="url"
+                                                        value={img}
+                                                        onChange={(e) => updateImage(index, e.target.value)}
+                                                        placeholder="Or paste URL..."
+                                                        className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-red text-sm"
+                                                    />
+
+                                                    {/* Remove Button */}
+                                                    {formData.images.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeImage(index)}
+                                                            className="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                                                        >
+                                                            <X size={18} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                     <button
                                         type="button"
                                         onClick={addImageField}
-                                        className="text-sm text-brand-red hover:underline"
+                                        className="mt-3 text-sm text-brand-red hover:underline flex items-center gap-1"
                                     >
-                                        + Add another image
+                                        <Plus size={16} />
+                                        Add another image
                                     </button>
                                 </div>
 
@@ -488,6 +706,17 @@ export default function ModelsPage() {
                                     />
                                     <label htmlFor="featured" className="text-sm text-gray-700">Featured Model</label>
                                 </div>
+
+                                {/* Error Message */}
+                                {saveError && (
+                                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                                        <AlertCircle className="text-red-500 flex-shrink-0 mt-0.5" size={20} />
+                                        <div>
+                                            <p className="text-sm font-medium text-red-800">Failed to save model</p>
+                                            <p className="text-sm text-red-600 mt-1">{saveError}</p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Actions */}
                                 <div className="flex gap-4 pt-4 border-t border-gray-100">
