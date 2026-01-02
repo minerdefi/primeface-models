@@ -40,10 +40,10 @@ export default function ContactPage() {
                             <Phone className="w-10 h-10 mx-auto mb-6 text-black" />
                             <h3 className="font-bold text-lg mb-4 uppercase tracking-wide text-brand-red">Call Us</h3>
                             <a
-                                href="tel:+12812100012"
+                                href="tel:+18082539402"
                                 className="text-2xl font-bold text-black hover:text-gray-600 transition"
                             >
-                                281-210-0012
+                                +1 (808) 253-9402
                             </a>
                         </motion.div>
 

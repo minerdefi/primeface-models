@@ -335,17 +335,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="text-center mt-8">
-            <a
-              href="https://instagram.com/firstmodelsandtalent"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-brand-red hover:text-gray-900 transition font-medium"
-            >
-              <Instagram size={20} />
-              Follow us on Instagram
-            </a>
-          </div>
+
         </div>
       </section>
     </main>

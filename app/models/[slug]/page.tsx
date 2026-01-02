@@ -280,10 +280,10 @@ export default function ModelPage() {
                         >
                             <p className="text-xs tracking-wider text-gray-500 mb-2">INQUIRE AT:</p>
                             <a
-                                href="tel:+12812100012"
+                                href="tel:+18082539402"
                                 className="text-2xl font-bold text-gray-900 hover:text-brand-red transition"
                             >
-                                (281) 210-0012
+                                +1 (808) 253-9402
                             </a>
                             <a
                                 href="mailto:info@primefacemodels.com"
@@ -332,10 +332,10 @@ export default function ModelPage() {
                         >
                             <p className="text-xs tracking-wider text-gray-500 mb-2">INQUIRE AT:</p>
                             <a
-                                href="tel:+12812100012"
+                                href="tel:+18082539402"
                                 className="text-2xl font-bold text-gray-900 hover:text-brand-red transition"
                             >
-                                (281) 210-0012
+                                +1 (808) 253-9402
                             </a>
                             <a
                                 href="mailto:info@primefacemodels.com"
