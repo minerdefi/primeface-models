@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
+import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 export default function BecomeAModelPage() {
     const [formData, setFormData] = useState({
@@ -29,6 +30,9 @@ export default function BecomeAModelPage() {
     });
 
     const [images, setImages] = useState<File[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -42,10 +46,96 @@ export default function BecomeAModelPage() {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const uploadImage = async (file: File): Promise<string | null> => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('bucket', 'application-images');
+
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+
+            const data = await response.json();
+            return data.url;
+        } catch (error) {
+            console.error('Image upload error:', error);
+            return null;
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle form submission
-        console.log('Form submitted:', formData, images);
+        setIsSubmitting(true);
+        setSubmitStatus('idle');
+        setErrorMessage('');
+
+        try {
+            // Upload images first
+            const imageUrls: string[] = [];
+            for (const image of images) {
+                if (image) {
+                    const url = await uploadImage(image);
+                    if (url) {
+                        imageUrls.push(url);
+                    }
+                }
+            }
+
+            // Submit application
+            const response = await fetch('/api/applications', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    imageUrls,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to submit application');
+            }
+
+            setSubmitStatus('success');
+            // Reset form
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                address: '',
+                city: '',
+                state: '',
+                dateOfBirth: '',
+                instagram: '',
+                facebook: '',
+                message: '',
+                gender: 'female',
+                height: '',
+                waist: '',
+                bust: '',
+                hips: '',
+                dressSize: '',
+                shoeSize: '',
+                hairColor: '',
+                eyeColor: '',
+            });
+            setImages([]);
+        } catch (error) {
+            console.error('Submit error:', error);
+            setSubmitStatus('error');
+            setErrorMessage(error instanceof Error ? error.message : 'An error occurred');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -415,23 +505,42 @@ export default function BecomeAModelPage() {
                             </motion.div>
                         </div>
 
-                        {/* reCAPTCHA and Submit Button */}
+                        {/* Status Messages and Submit Button */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.5 }}
                             className="mt-8 flex flex-col items-end gap-4"
                         >
-                            {/* Placeholder for reCAPTCHA */}
-                            <div className="border border-gray-300 p-4 bg-gray-50 text-sm text-gray-600">
-                                reCAPTCHA placeholder - integrate with Google reCAPTCHA
-                            </div>
+                            {/* Success Message */}
+                            {submitStatus === 'success' && (
+                                <div className="w-full flex items-center gap-2 p-4 bg-green-50 border border-green-200 text-green-700 rounded">
+                                    <CheckCircle size={20} />
+                                    <span>Your application has been submitted successfully! We will be in touch soon.</span>
+                                </div>
+                            )}
+
+                            {/* Error Message */}
+                            {submitStatus === 'error' && (
+                                <div className="w-full flex items-center gap-2 p-4 bg-red-50 border border-red-200 text-red-700 rounded">
+                                    <AlertCircle size={20} />
+                                    <span>{errorMessage || 'An error occurred. Please try again.'}</span>
+                                </div>
+                            )}
 
                             <button
                                 type="submit"
-                                className="px-12 py-3 bg-black text-white font-medium hover:bg-gray-800 transition"
+                                disabled={isSubmitting}
+                                className="px-12 py-3 bg-black text-white font-medium hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                Send
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 size={20} className="animate-spin" />
+                                        Submitting...
+                                    </>
+                                ) : (
+                                    'Send'
+                                )}
                             </button>
                         </motion.div>
                     </motion.form>

@@ -1,0 +1,41 @@
+-- Create Admin User for Backstage Access
+-- Run this in Supabase SQL Editor OR use the Authentication dashboard
+
+-- Option 1: Use the Supabase Dashboard (Recommended)
+-- 1. Go to Authentication → Users
+-- 2. Click "Add User" → "Create new user"
+-- 3. Enter email: admin@primefacemodels.com (or your preferred email)
+-- 4. Enter a strong password
+-- 5. Check "Auto Confirm User" to skip email verification
+-- 6. Click "Create User"
+
+-- Option 2: If you need to create via SQL (requires service_role key)
+-- Note: This requires running with elevated privileges
+
+-- INSERT INTO auth.users (
+--     id,
+--     email,
+--     encrypted_password,
+--     email_confirmed_at,
+--     created_at,
+--     updated_at,
+--     raw_app_meta_data,
+--     raw_user_meta_data,
+--     is_super_admin,
+--     role
+-- )
+-- VALUES (
+--     gen_random_uuid(),
+--     'admin@primefacemodels.com',
+--     crypt('your-secure-password', gen_salt('bf')),
+--     now(),
+--     now(),
+--     now(),
+--     '{"provider":"email","providers":["email"]}',
+--     '{"name":"Admin"}',
+--     false,
+--     'authenticated'
+-- );
+
+-- IMPORTANT: After creating the user, you can login at:
+-- http://localhost:3000/backstage/login
